@@ -1,14 +1,12 @@
 export default async (req, res) => {
-    const { username } = req.query;
-    
-    try {
-        const response = await fetch(`https://api.kaito.ai/api/v1/yaps?username=${username}`);
-        const data = await response.json();
-        
-        res.status(200).json(data);
-    } catch (error) {
-        res.status(500).json({
-            error: 'Failed to fetch data from Kaito API'
-        });
-    }
+  console.log('Received request for username:', req.query.username);
+  try {
+    const response = await fetch(`https://api.kaito.ai/api/v1/yaps?username=${req.query.username}`);
+    console.log('Kaito API response status:', response.status);
+    const data = await response.json();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Proxy error:', error);
+    res.status(500).json({ error: error.message });
+  }
 };
