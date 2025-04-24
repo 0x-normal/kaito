@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaito.ai Analytics</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --background: #0f172a;
+        }
+
+        body {
+            background: var(--background);
+            color: white;
+            font-family: system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        input {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kaito.ai Analytics</h1>
+        <div class="search-box">
+            <input type="text" id="username" placeholder="Enter username...">
+            <button onclick="fetchData()">Search</button>
+        </div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        async function fetchData() {
+            const username = document.getElementById('username').value;
+            const results = document.getElementById('results');
+            
+            try {
+                const response = await fetch(`/api/proxy?username=${encodeURIComponent(username)}`);
+                const data = await response.json();
+
+                results.innerHTML = `
+                    <h2>@${data.username} Statistics</h2>
+                    <div class="stats-grid">
+                        ${Object.entries({
+                            'yaps_all': 'All Time',
+                            'yaps_124h': '24 Hours',
+                            'yaps_148h': '48 Hours',
+                            'yaps_17d': '7 Days',
+                            'yaps_130d': '30 Days',
+                            'yaps_13m': '3 Months',
+                            'yaps_16m': '6 Months',
+                            'yaps_112m': '12 Months'
+                        }).map(([key, label]) => `
+                            <div class="stat-card">
+                                <div class="stat-value">${data[key].toFixed(2)}</div>
+                                <div class="stat-label">${label}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+            } catch (error) {
+                results.innerHTML = `<p style="color: #ef4444">Error loading data. Please try again.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
